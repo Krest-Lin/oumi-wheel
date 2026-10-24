@@ -82,6 +82,28 @@ body{background:radial-gradient(1400px 900px at 50% -12%,#35244c 0%,var(--bg) 55
 .cfp{position:absolute;width:9px;height:14px;top:-20px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
 .toast{position:fixed;left:50%;bottom:12%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;z-index:200;display:none}
+
+/* ===== 模式切换 ===== */
+.modebar{display:flex;gap:8px;justify-content:center;margin:0 auto 12px;max-width:380px}
+.mode{flex:1;text-align:center;padding:9px 0;border-radius:12px;background:var(--card2);color:var(--sub);font-size:13.5px;cursor:pointer;border:1px solid transparent;user-select:none}
+.mode.on{background:linear-gradient(160deg,#5a4718,#3a2d14);color:var(--gold);border-color:rgba(245,196,81,.5);font-weight:700}
+/* ===== 转盘 ===== */
+.wheelbox{position:relative;max-width:330px;margin:0 auto 8px}
+.wheelbox canvas{width:100%;height:auto;display:block;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
+.wheelbox .pointer{position:absolute;top:-4px;left:50%;transform:translateX(-50%);font-size:26px;color:var(--gold);text-shadow:0 2px 6px rgba(0,0,0,.7);z-index:3;line-height:1}
+/* ===== 店铺查询 ===== */
+.qbox{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.qbox input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--txt);font-size:14px;outline:none;min-width:0}
+.qbox input:focus{border-color:var(--gold)}
+.qcount{font-size:12px;color:var(--sub);white-space:nowrap}
+.q-item{background:var(--card2);border:1px solid transparent;border-radius:12px;margin-bottom:7px;overflow:hidden}
+.q-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;cursor:pointer}
+.q-head b{font-size:14px}
+.q-meta{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:55%}
+.q-body{padding:2px 12px 11px;border-top:1px dashed rgba(245,196,81,.15)}
+.q-sub{font-size:12.5px;color:var(--sub);margin-top:5px;line-height:1.5}
+.q-more{text-align:center;font-size:12px;color:var(--sub);padding:6px}
+.q-empty{text-align:center;color:var(--sub);font-size:13px;padding:14px}
 </style>
 </head>
 <body>
@@ -107,12 +129,19 @@ body{background:radial-gradient(1400px 900px at 50% -12%,#35244c 0%,var(--bg) 55
 <div class="count">当前 <b id="poolCount">0</b> 家店参与抽奖</div>
 <div class="empty" id="emptyHint">没有符合条件的店，放宽筛选条件吧</div>
 
-<div class="machine">
+<div class="modebar">
+  <span class="mode on" id="mode-slot">🎰 老虎机</span><span class="mode" id="mode-wheel">🎡 转盘</span>
+</div>
+<div class="machine" id="machine-slot">
   <div class="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div class="slot-window">
     <div class="sel-bar"></div>
     <div class="track" id="track"></div>
   </div>
+</div>
+<div class="wheelbox" id="wheelbox" style="display:none">
+  <div class="pointer">▼</div>
+  <canvas id="wheel" width="600" height="600"></canvas>
 </div>
 <button class="pullbtn" id="spin">🎰 拉杆抽奖</button>
 <div class="hint">摇到中间金色框里的就是今晚的答案</div>
@@ -132,6 +161,12 @@ body{background:radial-gradient(1400px 900px at 50% -12%,#35244c 0%,var(--bg) 55
       <div class="rbtn" id="againBtn">🔄 不满意，再来</div>
     </div>
   </div>
+</div>
+
+<div class="card" id="queryCard">
+  <h2>📋 店铺查询 <span class="act" id="queryClear">清空</span></h2>
+  <div class="qbox"><input id="q-input" placeholder="搜店名 / 地址 / 菜系 / 推荐人 / 招牌菜…"><span class="qcount" id="q-count"></span></div>
+  <div id="q-list"></div>
 </div>
 
 <div class="card" id="histCard" style="display:none">
@@ -178,6 +213,7 @@ let customs=lsGet("omh_custom","[]");
 let history=lsGet("omh_hist","[]");
 const state={region:new Set(),cuisine:new Set(),price:new Set(),star:new Set(),park:new Set(),recommender:new Set()};
 let pool=[],spinning=false,pos=0; // pos=当前已滚动的像素
+let mode=lsGet("omh_mode",'"slot"'); // slot=老虎机 wheel=转盘（默认值需是合法 JSON）
 const REPEATS=5, ROWH=62, DUR=4200;
 const $=id=>document.getElementById(id);
 function allStores(){return DATA.concat(customs)}
@@ -238,6 +274,7 @@ function refresh(){
   $("emptyHint").style.display=pool.length?"none":"block";
   $("spin").disabled=pool.length===0;
   renderTrack();
+  if(mode==="wheel")drawWheel();
 }
 
 function rowHTML(r){
@@ -259,6 +296,7 @@ function renderTrack(){
 function yFor(loops,i){return (loops*pool.length+i)*ROWH-ROWH}
 
 function spin(){
+  if(mode==="wheel"){spinWheel();return}
   if(spinning||!pool.length)return;
   spinning=true;$("spin").disabled=true;$("result").classList.remove("show");
   const n=pool.length;
@@ -338,7 +376,7 @@ function renderCust(){
     `<div class="cust-item"><span>✨ ${c.name} <i style="color:var(--sub);font-style:normal;font-size:12px">· ${c.region||"未标"}</i></span><span class="del" data-i="${i}">删除</span></div>`).join("");
   el.querySelectorAll(".del").forEach(b=>b.onclick=()=>{
     customs.splice(+b.dataset.i,1);lsSet("omh_custom",customs);
-    renderCust();fillDatalists();refresh();toast("已删除");
+    renderCust();fillDatalists();refresh();renderQuery();toast("已删除");
   });
 }
 
@@ -364,7 +402,7 @@ $("addBtn").onclick=()=>{
     custom:true,hasGoodReview:true});
   lsSet("omh_custom",customs);
   ["i-name","i-region","i-addr","i-cuisine","i-sign","i-reason"].forEach(id=>$(id).value="");
-  renderCust();fillDatalists();refresh();
+  renderCust();fillDatalists();refresh();renderQuery();
   toast("已加入抽奖池 ✨");
 };
 $("toggleForm").onclick=()=>{
@@ -382,12 +420,133 @@ $("resetFilters").onclick=()=>{
 $("spin").onclick=spin;$("againBtn").onclick=spin;
 $("onlyRecommender").onchange=refresh;$("hideDrawn").onchange=refresh;
 
+
+/* ===== 通用：复制文本 ===== */
+function copyText(txt){
+  const done=()=>toast("已复制到剪贴板");
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fallback())}
+  else fallback();
+  function fallback(){
+    const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand("copy");done()}catch(e){toast("复制失败，可手动长按复制")}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ===== 模式切换：老虎机 / 转盘 ===== */
+function applyMode(){
+  const wheel=mode==="wheel";
+  $("mode-slot").classList.toggle("on",!wheel);
+  $("mode-wheel").classList.toggle("on",wheel);
+  $("machine-slot").style.display=wheel?"none":"block";
+  $("wheelbox").style.display=wheel?"block":"none";
+  $("spin").textContent=wheel?"🎡 转盘抽奖":"🎰 拉杆抽奖";
+  if(wheel)drawWheel();
+}
+$("mode-slot").onclick=()=>{mode="slot";lsSet("omh_mode",mode);applyMode()};
+$("mode-wheel").onclick=()=>{mode="wheel";lsSet("omh_mode",mode);applyMode()};
+
+/* ===== 转盘：画一次，动画只转 CSS transform（不吃 CPU） ===== */
+const WHEEL_COLORS=["#3d2f57","#4a3a18","#2f3d33","#3a2440","#443021","#26303f","#332a4d","#3c3115"];
+let wheelAngle=0;
+function clip(s,n){s=(s||"").trim();return s.length>n?s.slice(0,n-1)+"…":s}
+function drawWheel(){
+  const cv=$("wheel");if(!cv)return;
+  const ctx=cv.getContext("2d"),S=cv.width,R=S/2;
+  ctx.clearRect(0,0,S,S);
+  const n=pool.length;
+  if(!n){
+    ctx.fillStyle="#241a2e";ctx.beginPath();ctx.arc(R,R,R-4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#a294b5";ctx.font="600 20px -apple-system,'PingFang SC'";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("空空如也",R,R);return;
+  }
+  const seg=360/n;
+  for(let i=0;i<n;i++){
+    const a0=(-90+i*seg)*Math.PI/180,a1=(-90+(i+1)*seg)*Math.PI/180;
+    ctx.beginPath();ctx.moveTo(R,R);ctx.arc(R,R,R-6,a0,a1);ctx.closePath();
+    ctx.fillStyle=WHEEL_COLORS[i%WHEEL_COLORS.length];ctx.fill();
+    ctx.strokeStyle="rgba(245,196,81,.32)";ctx.lineWidth=1;ctx.stroke();
+    ctx.save();ctx.translate(R,R);ctx.rotate((-90+(i+.5)*seg)*Math.PI/180);
+    ctx.fillStyle="#f4eefa";ctx.textAlign="right";ctx.textBaseline="middle";
+    if(seg>=7){ctx.font="600 13px -apple-system,'PingFang SC',sans-serif";ctx.fillText(clip(pool[i].name,7),R-14,0)}
+    else{ctx.font="600 10px -apple-system,sans-serif";ctx.fillText(String(i+1),R-12,0)}
+    ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(R,R,36,0,Math.PI*2);ctx.fillStyle="#241a05";ctx.fill();
+  ctx.strokeStyle="#f5c451";ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle="#f5c451";ctx.font="700 15px -apple-system,'PingFang SC'";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText("转",R,R);
+}
+function spinWheel(){
+  if(spinning||!pool.length)return;
+  spinning=true;$("spin").disabled=true;$("result").classList.remove("show");
+  const n=pool.length,seg=360/n;
+  const idx=Math.floor(Math.random()*n);           // 每家中奖概率完全一致
+  const desired=(-(idx+0.5)*seg)%360;              // 让该格中心停在正上方指针处
+  const cur=((wheelAngle%360)+360)%360;
+  const delta=(((desired-cur)%360)+360)%360;
+  wheelAngle+=5*360+delta;                          // 5 整圈 + 定点
+  const cv=$("wheel");
+  let done=false;
+  function finish(){
+    if(done)return;done=true;
+    spinning=false;$("spin").disabled=pool.length===0;
+    const r=pool[idx];showResult(r);confetti();
+    history.unshift({id:r.name+"|"+r.addr,name:r.name,addr:r.addr||"",region:r.region||"",t:new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"})});
+    lsSet("omh_hist",history);renderHist();
+    if($("hideDrawn").checked){refresh()}
+  }
+  cv.style.transition="transform 5200ms cubic-bezier(.12,.72,.12,1)";
+  cv.style.transform="rotate("+wheelAngle+"deg)";
+  cv.addEventListener("transitionend",finish,{once:true});
+  setTimeout(finish,5800);  // 兜底：微信浏览器不触发 transitionend 也能收尾
+}
+
+/* ===== 店铺查询（不抽奖也能查） ===== */
+function renderQuery(){
+  const kw=($("q-input").value||"").trim().toLowerCase();
+  const list=allStores().filter(r=>{
+    if(!kw)return true;
+    return [r.name,r.addr,r.cuisine,r.region,r.recommender,r.sign,r.reason,r.price].join(" ").toLowerCase().includes(kw);
+  });
+  $("q-count").textContent=kw?("命中 "+list.length+" 家"):(list.length+" 家");
+  const el=$("q-list");
+  if(!list.length){el.innerHTML='<div class="q-empty">没找到，换个关键词试试</div>';return}
+  const show=list.slice(0,kw?200:60);
+  el.innerHTML=show.map((r,i)=>
+   `<div class="q-item">
+      <div class="q-head" data-i="${i}"><b>${r.name}</b><span class="q-meta">${[r.cuisine,r.region,r.price].filter(Boolean).join(" · ")||" "}</span></div>
+      <div class="q-body" style="display:none">
+        <div class="q-sub">📍 ${r.addr||"未填地址"}</div>
+        <div class="q-sub">${r.recommender?"🙋 "+r.recommender+"　":""}${r.stars?"⭐".repeat(r.stars)+"　":""}${r.park?"🅿️ "+r.park:""}</div>
+        ${r.sign?`<div class="q-sub">🍤 ${r.sign}</div>`:""}
+        ${r.reason?`<div class="q-sub">💬 ${r.reason}</div>`:""}
+        <div class="ractions">
+          <a class="rbtn map" target="_blank" href="https://uri.amap.com/search?keyword=${encodeURIComponent((r.name||"")+" "+(r.addr||""))}">🗺 导航</a>
+          <div class="rbtn" data-copy="${encodeURIComponent((r.name||"")+" "+(r.addr||""))}">📋 复制地址</div>
+        </div>
+      </div>
+    </div>`).join("") + (list.length>show.length?`<div class="q-more">先显示 ${show.length} 家，输入关键词可搜全部 ${list.length} 家</div>`:"");
+  el.querySelectorAll(".q-head").forEach(head=>{
+    head.onclick=()=>{
+      const b=head.nextElementSibling;
+      b.style.display=b.style.display==="none"?"block":"none";
+    };
+  });
+  el.querySelectorAll("[data-copy]").forEach(b=>{
+    b.onclick=e=>{e.stopPropagation();copyText(decodeURIComponent(b.dataset.copy))};
+  });
+}
+$("q-input").oninput=renderQuery;
+$("queryClear").onclick=()=>$("q-input").value="",renderQuery();
+
 buildChips("f-region",uniq("region"),state.region);
 buildChips("f-cuisine",uniq("cuisine"),state.cuisine);
 buildChips("f-price",["0-50元","50-100元","100-200元","200元以上","未标"],state.price);
 const starVals=[...new Set(allStores().map(r=>String(r.stars||0)))].filter(s=>s!=="0").sort((a,b)=>b-a);
 buildChips("f-star",starVals,state.star);
-buildExtra();fillDatalists();renderCust();renderHist();refresh();
+buildExtra();fillDatalists();renderCust();renderHist();refresh();renderQuery();applyMode();
 </script>
 </body>
 </html>
