@@ -98,6 +98,7 @@ body{background:radial-gradient(1400px 900px at 50% -12%,#35244c 0%,var(--bg) 55
   <div class="fgroup"><div class="ftitle">菜系</div><div class="chips" id="f-cuisine"></div></div>
   <div class="fgroup"><div class="ftitle">人均</div><div class="chips" id="f-price"></div></div>
   <div class="fgroup"><div class="ftitle">星级</div><div class="chips" id="f-star"></div></div>
+  <div class="fgroup"><div class="ftitle">推荐人</div><div class="chips" id="f-recommender"></div></div>
   <div class="fgroup"><div class="ftitle">其他</div><div class="chips" id="f-extra"></div></div>
   <div class="fgroup"><label class="switch"><input type="checkbox" id="hideDrawn"><span class="sw"></span>排除本次已抽过的店</label></div>
   <div class="fgroup"><label class="switch"><input type="checkbox" id="onlyRecommender"><span class="sw"></span>只抽「车友吃过且说好吃」的店</label></div>
@@ -175,7 +176,7 @@ function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
 let customs=lsGet("omh_custom","[]");
 let history=lsGet("omh_hist","[]");
-const state={region:new Set(),cuisine:new Set(),price:new Set(),star:new Set(),park:new Set()};
+const state={region:new Set(),cuisine:new Set(),price:new Set(),star:new Set(),park:new Set(),recommender:new Set()};
 let pool=[],spinning=false,pos=0; // pos=当前已滚动的像素
 const REPEATS=5, ROWH=62, DUR=4200;
 const $=id=>document.getElementById(id);
@@ -188,6 +189,22 @@ function buildChips(elId,values,set){
   values.forEach(v=>{
     const c=document.createElement("div");c.className="chip";c.textContent=v;
     c.onclick=()=>{set.has(v)?set.delete(v):set.add(v);c.classList.toggle("on");refresh()};
+    el.appendChild(c);
+  });
+}
+function buildRecommenderChips(){
+  const el=$("f-recommender");if(!el)return;
+  const cnt={};
+  allStores().forEach(r=>{const b=(r.recommender||"").trim();if(b)cnt[b]=(cnt[b]||0)+1});
+  el.innerHTML="";
+  Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a.localeCompare(b,"zh")).forEach(name=>{
+    const c=document.createElement("div");c.className="chip";
+    c.textContent=name+" ×"+cnt[name];
+    if(state.recommender.has(name))c.classList.add("on");
+    c.onclick=()=>{
+      state.recommender.has(name)?state.recommender.delete(name):state.recommender.add(name);
+      c.classList.toggle("on");refresh();
+    };
     el.appendChild(c);
   });
 }
@@ -205,12 +222,14 @@ function fillDatalists(){
 }
 
 function refresh(){
+  buildRecommenderChips();
   pool=allStores().filter(r=>{
     if(state.region.size&&!state.region.has(r.region))return false;
     if(state.cuisine.size&&!state.cuisine.has(r.cuisine))return false;
     if(state.price.size&&!state.price.has(r.price||"未标"))return false;
     if(state.star.size&&!state.star.has(String(r.stars||0)))return false;
     if(state.park.size&&!state.park.has(r.park||"无"))return false;
+    if(state.recommender.size&&!state.recommender.has((r.recommender||"").trim()))return false;
     if($("onlyRecommender").checked&&!(r.hasGoodReview||r.custom))return false;
     if($("hideDrawn").checked&&history.some(h=>h.id===r.name+"|"+r.addr))return false;
     return true;
