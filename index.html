@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>瓯米会 · 今晚吃啥老虎机</title>
+<style>
+:root{--bg:#120e17;--card:rgba(38,29,52,.85);--card2:#332745;--gold:#f5c451;--txt:#f4eefa;--sub:#a294b5;--acc:#ff6b6b;--ok:#4ecdc4;--line:rgba(245,196,81,.18);--rowH:62px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(1400px 900px at 50% -12%,#35244c 0%,var(--bg) 55%) fixed;color:var(--txt);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;padding-bottom:48px}
+.hero{text-align:center;padding:22px 16px 6px}
+.hero h1{font-size:25px;letter-spacing:3px;color:var(--gold);text-shadow:0 2px 12px rgba(245,196,81,.35)}
+.hero .sub{color:var(--sub);font-size:12px;margin-top:6px;letter-spacing:1px}
+.wrap{max-width:560px;margin:0 auto;padding:0 12px}
+.card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:13px;box-shadow:0 8px 26px rgba(0,0,0,.35)}
+.card h2{font-size:14.5px;color:var(--gold);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.card h2 .act{font-size:11.5px;color:var(--sub);font-weight:400;cursor:pointer;padding:2px 8px;border:1px solid var(--line);border-radius:999px}
+.fgroup{margin-bottom:10px}.fgroup:last-child{margin-bottom:0}
+.ftitle{font-size:12px;color:var(--sub);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 11px;border-radius:999px;background:var(--card2);font-size:12px;color:var(--txt);cursor:pointer;user-select:none;border:1px solid transparent;transition:.15s}
+.chip:active{transform:scale(.93)}
+.chip.on{background:var(--gold);color:#241a05;font-weight:600}
+.switch{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.sw{width:38px;height:22px;border-radius:999px;background:var(--card2);position:relative;transition:.2s;flex:none}
+.sw::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s}
+.switch input{display:none}
+.switch input:checked+.sw{background:var(--ok)}
+.switch input:checked+.sw::after{left:18px}
+.count{text-align:center;font-size:13px;color:var(--sub);margin:4px 0 8px}
+.count b{color:var(--gold);font-size:17px}
+/* ===== 老虎机 ===== */
+.machine{position:relative;max-width:380px;margin:0 auto;background:linear-gradient(160deg,#4a3a18,#2b2110 60%,#3a2d14);border-radius:26px;padding:16px 16px 18px;box-shadow:0 12px 34px rgba(0,0,0,.55),inset 0 0 0 2px rgba(245,196,81,.45),inset 0 0 22px rgba(0,0,0,.5)}
+.lights{display:flex;justify-content:space-between;padding:0 6px 10px}
+.lights i{width:9px;height:9px;border-radius:50%;background:#6b5518;animation:blink 1.1s infinite}
+.lights i:nth-child(2n){animation-delay:.55s}
+@keyframes blink{0%,100%{background:#6b5518;box-shadow:none}50%{background:#ffe082;box-shadow:0 0 8px #ffd54f}}
+.slot-window{position:relative;height:calc(var(--rowH)*3);overflow:hidden;border-radius:14px;background:#0d0a12;box-shadow:inset 0 6px 16px rgba(0,0,0,.7),inset 0 -6px 16px rgba(0,0,0,.7);border:2px solid rgba(245,196,81,.55)}
+.sel-bar{position:absolute;top:var(--rowH);left:0;right:0;height:var(--rowH);pointer-events:none;z-index:2;background:linear-gradient(90deg,rgba(245,196,81,.28),rgba(245,196,81,.12));border-top:2px solid var(--gold);border-bottom:2px solid var(--gold)}
+.sel-bar::before,.sel-bar::after{content:"";position:absolute;top:50%;transform:translateY(-50%);border:11px solid transparent}
+.sel-bar::before{left:4px;border-left:14px solid var(--gold)}
+.sel-bar::after{right:4px;border-right:14px solid var(--gold)}
+.track{position:absolute;left:0;right:0;top:0;will-change:transform}
+.row{height:var(--rowH);display:flex;flex-direction:column;justify-content:center;padding:0 26px;border-bottom:1px dashed rgba(255,255,255,.06)}
+.row b{font-size:15.5px;color:#e9e1f2;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row span{font-size:11.5px;color:#8d7fa1;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row:nth-child(3n+1){background:rgba(255,255,255,.02)}
+.pullbtn{display:block;margin:16px auto 4px;padding:14px 56px;border:none;border-radius:999px;background:linear-gradient(135deg,#ffdf88,var(--gold) 55%,#e0a82e);color:#2c2004;font-size:17px;font-weight:800;letter-spacing:5px;box-shadow:0 8px 22px rgba(245,196,81,.4);cursor:pointer;transition:transform .12s}
+.pullbtn:active{transform:scale(.96)}
+.pullbtn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.hint{text-align:center;color:var(--sub);font-size:11.5px;margin-top:7px}
+.result{display:none}.result.show{display:block;animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.rname{font-size:22px;font-weight:800;color:var(--gold);margin-bottom:9px;line-height:1.4}
+.rtags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.rtag{background:var(--card2);padding:3px 10px;border-radius:999px;font-size:12px;color:var(--ok)}
+.rrow{font-size:13.5px;line-height:1.8;color:var(--txt)}
+.rrow i{font-style:normal;color:var(--sub)}
+.rreason{margin-top:9px;padding:10px 12px;background:rgba(255,107,107,.08);border-left:3px solid var(--acc);border-radius:8px;font-size:13px;line-height:1.75}
+.ractions{display:flex;gap:9px;margin-top:13px;flex-wrap:wrap}
+.rbtn{flex:1;min-width:100px;padding:11px 0;text-align:center;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:13px;text-decoration:none;cursor:pointer}
+.rbtn.map{background:linear-gradient(135deg,#58c76a,#2ea043);border:none;color:#fff;font-weight:700}
+.hist-item{display:flex;gap:10px;padding:9px 4px;border-bottom:1px dashed rgba(255,255,255,.08);font-size:13.5px;align-items:flex-start}
+.hist-item:last-child{border-bottom:none}
+.hist-no{flex:none;width:22px;height:22px;border-radius:50%;background:var(--card2);color:var(--gold);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.hist-main{flex:1}.hist-main b{color:var(--txt)}.hist-main .ha{color:var(--sub);font-size:12px;display:block;margin-top:2px}
+.hist-time{flex:none;color:var(--sub);font-size:11.5px;margin-top:2px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.form-grid .full{grid-column:1/-1}
+.fld label{display:block;font-size:11.5px;color:var(--sub);margin-bottom:4px}
+.fld input,.fld select{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:#1d1629;color:var(--txt);font-size:14px;outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--gold)}
+.addbtn{width:100%;margin-top:11px;padding:11px 0;border:none;border-radius:12px;background:linear-gradient(135deg,#8be9dd,var(--ok));color:#06302c;font-weight:800;font-size:14px;letter-spacing:2px;cursor:pointer}
+.custlist{margin-top:11px}
+.cust-item{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:13px}
+.cust-item .del{color:var(--acc);font-size:12px;cursor:pointer;padding:2px 6px}
+.toggle-form{cursor:pointer;font-size:12px;color:var(--sub)}
+.tip{font-size:12.5px;line-height:2;color:var(--sub)}
+.tip b{color:var(--gold)}
+.empty{text-align:center;color:var(--acc);font-size:13px;margin:6px 0;display:none}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:99;overflow:hidden}
+.cfp{position:absolute;width:9px;height:14px;top:-20px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+.toast{position:fixed;left:50%;bottom:12%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;z-index:200;display:none}
+</style>
+</head>
+<body>
+<div id="confetti"></div>
+<div class="hero">
+  <h1>🎰 瓯米会吃啥老虎机</h1>
+  <div class="sub">今晚吃什么？拉一下杆 · 每家中奖概率完全一致</div>
+</div>
+<div class="wrap">
+
+<div class="card">
+  <h2>🔍 筛选条件 <span class="act" id="resetFilters">清空筛选</span></h2>
+  <div class="fgroup"><div class="ftitle">地区</div><div class="chips" id="f-region"></div></div>
+  <div class="fgroup"><div class="ftitle">菜系</div><div class="chips" id="f-cuisine"></div></div>
+  <div class="fgroup"><div class="ftitle">人均</div><div class="chips" id="f-price"></div></div>
+  <div class="fgroup"><div class="ftitle">星级</div><div class="chips" id="f-star"></div></div>
+  <div class="fgroup"><div class="ftitle">其他</div><div class="chips" id="f-extra"></div></div>
+  <div class="fgroup"><label class="switch"><input type="checkbox" id="hideDrawn"><span class="sw"></span>排除本次已抽过的店</label></div>
+  <div class="fgroup"><label class="switch"><input type="checkbox" id="onlyRecommender"><span class="sw"></span>只抽「车友吃过且说好吃」的店</label></div>
+</div>
+
+<div class="count">当前 <b id="poolCount">0</b> 家店参与抽奖</div>
+<div class="empty" id="emptyHint">没有符合条件的店，放宽筛选条件吧</div>
+
+<div class="machine">
+  <div class="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="slot-window">
+    <div class="sel-bar"></div>
+    <div class="track" id="track"></div>
+  </div>
+</div>
+<button class="pullbtn" id="spin">🎰 拉杆抽奖</button>
+<div class="hint">摇到中间金色框里的就是今晚的答案</div>
+
+<div class="result" id="result">
+  <div class="card">
+    <div class="rname" id="r-name"></div>
+    <div class="rtags" id="r-tags"></div>
+    <div class="rrow"><i>📍 地址：</i><span id="r-addr"></span></div>
+    <div class="rrow"><i>💰 人均：</i><span id="r-price"></span>　<i>🅿️ 停车：</i><span id="r-park"></span></div>
+    <div class="rrow" id="r-signrow"><i>🍤 招牌：</i><span id="r-sign"></span></div>
+    <div class="rrow"><i>🙋 推荐人：</i><span id="r-by"></span></div>
+    <div class="rreason" id="r-reason"></div>
+    <div class="ractions">
+      <a class="rbtn map" id="r-nav" target="_blank">🗺 打开地图导航</a>
+      <div class="rbtn" id="r-copy">📋 复制地址</div>
+      <div class="rbtn" id="againBtn">🔄 不满意，再来</div>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="histCard" style="display:none">
+  <h2>📜 本次抽奖历史 <span><span class="act" id="histCount">0 次</span> <span class="act" id="histClear">清空</span></span></h2>
+  <div id="histList"></div>
+</div>
+
+<div class="card">
+  <h2>➕ 手动新增店铺 <span class="toggle-form" id="toggleForm">收起 ▴</span></h2>
+  <div id="formWrap">
+    <div class="form-grid">
+      <div class="fld"><label>店名 *</label><input id="i-name" placeholder="如：老王夜宵"></div>
+      <div class="fld"><label>地区 *</label><input id="i-region" list="dl-region" placeholder="如：瑞安"><datalist id="dl-region"></datalist></div>
+      <div class="fld full"><label>地址</label><input id="i-addr" placeholder="越详细，地图导航越准"></div>
+      <div class="fld"><label>菜系</label><input id="i-cuisine" list="dl-cuisine" placeholder="如：烧烤"><datalist id="dl-cuisine"></datalist></div>
+      <div class="fld"><label>人均</label><select id="i-price"><option value="">不填</option><option>0-50元</option><option>50-100元</option><option>100-200元</option><option>200元以上</option></select></div>
+      <div class="fld"><label>星级</label><select id="i-stars"><option>5</option><option>4</option><option>3</option></select></div>
+      <div class="fld"><label>招牌菜</label><input id="i-sign" placeholder="必点什么"></div>
+      <div class="fld full"><label>一句话推荐理由</label><input id="i-reason" placeholder="为什么值得去"></div>
+    </div>
+    <button class="addbtn" id="addBtn">＋ 加入抽奖池</button>
+  </div>
+  <div class="custlist" id="custList"></div>
+</div>
+
+<div class="card tip">
+<b>怎么筛最好玩（推荐）：</b><br>
+① 地区先锁「今晚活动半径」——跨区一小时车程比吃什么更影响体验；<br>
+② 人均按今晚钱包状态框一道；③ 星级只勾 4⭐、5⭐；<br>
+④ <b>筛到 15~40 家最佳</b>——太少没悬念，太多摇到眼花；<br>
+⑤ 抽过的店自动进历史，「排除本次已抽过的」一开就不重样；<br>
+⑥ 表格里没有的宝藏店，用「手动新增」当场加进抽奖池。
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA=[{"name": "萝卜热炒", "cuisine": "川菜", "price": "50-100元", "region": "瑞安", "addr": "安阳路164-166号", "park": "无", "sign": "铁板盘茄，金钱蛋", "reason": "瑞安很下饭的川菜", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小盛", "hasGoodReview": true}, {"name": "明金牛排", "cuisine": "地方菜", "price": "50-100元", "region": "瑞安", "addr": "瑞安市湖岭镇兴湖路40号", "park": "无", "sign": "湖岭牛排", "reason": "全世界最好吃的湖岭牛排，香，为什么会这么香，香到爆", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "小詹", "hasGoodReview": true}, {"name": "小吕鸡爪", "cuisine": "泡泡/麻辣烫", "price": "50-100元", "region": "瓯海", "addr": "花园", "park": "有", "sign": "鸡爪，鸭舌等", "reason": "好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "lx", "hasGoodReview": true}, {"name": "金湖龙虾", "cuisine": "小龙虾", "price": "100-200元", "region": "鹿城", "addr": "龙汇广场", "park": "有", "sign": "冰镇龙虾、鸡爪", "reason": "好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "lx", "hasGoodReview": true}, {"name": "阿平烧烤", "cuisine": "烧烤烤肉", "price": "100-200元", "region": "鹿城", "addr": "石坦大厦", "park": "无", "sign": "烧烤", "reason": "味道可以，环境较差", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "lx", "hasGoodReview": true}, {"name": "朱富贵火锅", "cuisine": "火锅", "price": "", "region": "鹿城", "addr": "世贸银泰店", "park": "有", "sign": "海鲜火锅", "reason": "海鲜品类的，好吃不贵，但是推荐最好去福建吃", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": false}, {"name": "烫菜广场", "cuisine": "火锅", "price": "", "region": "鹿城", "addr": "水心两家店都行", "park": "无", "sign": "海鲜火锅，江蟹生，蟹钳", "reason": "海鲜都是活的", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "lx", "hasGoodReview": true}, {"name": "无招牌", "cuisine": "地方菜", "price": "", "region": "鹿城", "addr": "百里路后垟巷137号金德景园那边", "park": "有", "sign": "芋头，虾菇，牛肉", "reason": "鹿城老温州味", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "faryi", "hasGoodReview": true}, {"name": "阿根麻辣烫", "cuisine": "泡泡/麻辣烫", "price": "50-100元", "region": "瑞安", "addr": "飞龙路223号和盛佳苑阿根海鲜麻辣烫", "park": "无", "sign": "海鲜麻辣烫、五香鸭头、罗氏虾", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": false}, {"name": "古乐牛香（人民路店）", "cuisine": "火锅", "price": "", "region": "鹿城", "addr": "人民中路132号", "park": "无", "sign": "牛杂火锅，现切牛肉", "reason": "好吃的牛杂火锅，很好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "faryi", "hasGoodReview": true}, {"name": "天长牛肉火锅", "cuisine": "火锅", "price": "50-100元", "region": "瑞安", "addr": "岩松线西100米", "park": "无", "sign": "牛肉火锅", "reason": "每天现杀牛肉，附近风景也好，好吃不贵", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "小詹", "hasGoodReview": true}, {"name": "哇塞鱼鲜鱼火锅", "cuisine": "火锅", "price": "", "region": "瓯海", "addr": "月乐西街171号", "park": "无", "sign": "鲜鱼麻辣火锅", "reason": "活鱼现杀，锅底和蘸料都美味，可以让老板娘帮忙调蘸料，老板娘也是超级e啊", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "李可爱", "hasGoodReview": true}, {"name": "墨池川菜", "cuisine": "川菜", "price": "", "region": "鹿城", "addr": "五马街道彭楼街9号", "park": "无", "sign": "川菜", "reason": "好吃不贵", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "lx", "hasGoodReview": false}, {"name": "湖岭人涮牛肉（清荷小区店）", "cuisine": "火锅", "price": "50-100元", "region": "瑞安", "addr": "安阳街道马鞍山路95-105号(市府后面)", "park": "无", "sign": "铜锅涮肉", "reason": "羊肉、虾滑、秘制麻酱", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": true}, {"name": "开心烙锅", "cuisine": "烧烤烤肉", "price": "", "region": "瓯北", "addr": "罗浮大街北段10号", "park": "有", "sign": "青椒虾滑，牛肉，虾", "reason": "有点油，有人专门代煎", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "faryi", "hasGoodReview": false}, {"name": "鹿鼎牛潮汕鲜牛火锅牛肉粿条", "cuisine": "火锅", "price": "", "region": "瓯海", "addr": "龙霞路428号", "park": "有", "sign": "极品雪花，五花趾，吊龙", "reason": "牛肉非常之新鲜啊，极品雪花更是夯爆了，一整个滑到口腔里了，但是别涮老了哈，老板的潮汕口音也是正宗", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "李可爱", "hasGoodReview": true}, {"name": "黔途烙•贵州烙锅(万松东路店)", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "瑞安", "addr": "万松东路66号-2号", "park": "无", "sign": "烙锅，洋芋粑粑，五花肉，掌中宝，土豆", "reason": "好吃不贵，蘸料口味很好，坐着等别人投喂就完了", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": false}, {"name": "美美自助烧烤（瑞湖路店）", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "瑞安", "addr": "瑞安市瑞湖路257-261号", "park": "无", "sign": "牛肉、五花肉、掌中宝、烤肠", "reason": "点菜自己炭烤，食材新鲜", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": false}, {"name": "其乐小串", "cuisine": "烧烤烤肉", "price": "", "region": "乐清", "addr": "柳市柳江路1号", "park": "有", "sign": "牛肉 五花肉", "reason": "烧烤好吃不贵种类多", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "pony", "hasGoodReview": true}, {"name": "昊来了", "cuisine": "寿司", "price": "", "region": "鹿城", "addr": "印象城", "park": "有", "sign": "鹅肝，麻辣毛肚", "reason": "料大，味道好", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "雨", "hasGoodReview": false}, {"name": "冲天吼（拱瑞山路店）", "cuisine": "小龙虾", "price": "50-100元", "region": "瑞安", "addr": "瑞安市拱瑞山路店177-179号", "park": "无", "sign": "秘制龙虾、冰镇酒醉", "reason": "虾的个头很大，唯一缺点没有去虾线，但是味道真好吃，推荐是在龙虾的季节去，冰镇会有的一个奶白色的蘸料，绝绝子", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": false}, {"name": "肉炙•自助烤肉(瑞安吾悦广场店)", "cuisine": "烧烤烤肉", "price": "100-200元", "region": "瑞安", "addr": "罗阳大道瑞安新城吾悦广场5层5020号铺", "park": "有", "sign": "炭烤自助烤肉，牛肉", "reason": "便宜实惠，量大管饱，肉最起码不是合成的，福州品牌，福州那边吃会更好吃一点", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "小詹", "hasGoodReview": false}, {"name": "阿艇鱼头", "cuisine": "地方菜", "price": "0-50元", "region": "永嘉", "addr": "桥下二桥中巴站马路对面", "park": "有", "sign": "剁椒鱼头，剁椒乌鸡", "reason": "当地最忙碌的宵夜档之一晚5点营业", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "任安蔻", "hasGoodReview": true}, {"name": "老沙烧烤", "cuisine": "烧烤烤肉", "price": "", "region": "瓯海", "addr": "泽霞雅苑一组团14栋110-111号", "park": "有", "sign": "鸦片鱼头", "reason": "好吃！周边人都吃", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "热巴", "hasGoodReview": false}, {"name": "吕家12道 温州大排档", "cuisine": "地方菜", "price": "", "region": "瓯海", "addr": "梧田街道月乐西街222号塘西经合社大楼1层108号", "park": "有", "sign": "都不踩雷", "reason": "量大好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "热巴", "hasGoodReview": true}, {"name": "胖子牛火锅", "cuisine": "火锅", "price": "", "region": "瓯海", "addr": "梧田街道横塘中路66号", "park": "无", "sign": "就点牛肉锅底呗，所有都是现切的，很好吃", "reason": "量大实惠新鲜", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "热巴", "hasGoodReview": true}, {"name": "丹樂寿司", "cuisine": "寿司", "price": "", "region": "瓯海", "addr": "瓯海区-温瑞大道999号万象城D107（万象城一楼4号出口）", "park": "有", "sign": "寿司都还可以", "reason": "好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "热巴", "hasGoodReview": true}, {"name": "重庆人家", "cuisine": "川菜", "price": "", "region": "鹿城", "addr": "鹿城区滨江街道康源路86号", "park": "有", "sign": "水煮系列，鱼香肉丝，腰肝合炒", "reason": "", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "Ano", "hasGoodReview": true}, {"name": "大小吃货", "cuisine": "地方菜", "price": "", "region": "龙湾", "addr": "繁青路君悦华庭南6号", "park": "无", "sign": "水煮🐟酸菜鱼 牛肉拌面", "reason": "婚好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "好味道饭店(瑞光大道)", "cuisine": "地方菜", "price": "0-50元", "region": "瑞安", "addr": "瑞安市瑞光大道1号-1", "park": "无", "sign": "水煮鱼，白切肉，钉螺堡，各种小炒", "reason": "", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "摇摇乐", "hasGoodReview": true}, {"name": "鸟安居酒屋", "cuisine": "日式料理", "price": "", "region": "鹿城", "addr": "马鞍池东路8号", "park": "无", "sign": "烧鸟，寿司", "reason": "味道挺好吃的，精致偏贵", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "faryi", "hasGoodReview": false}, {"name": "大绿棒子东北烧烤", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "龙湾", "addr": "上江路凯迪中心", "park": "有", "sign": "烧烤", "reason": "好吃便宜", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "饭特稀", "hasGoodReview": false}, {"name": "巴渝川菜馆（皇都宾馆店）", "cuisine": "川菜", "price": "", "region": "瓯北", "addr": "江北大街南段皇都宾馆", "park": "有", "sign": "黑米饭，水煮鱼", "reason": "温州味版川菜老店", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "faryi", "hasGoodReview": false}, {"name": "一味独食火锅", "cuisine": "火锅", "price": "50-100元", "region": "鹿城", "addr": "东浦小村", "park": "有", "sign": "火锅", "reason": "适合一个人吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "饭特稀", "hasGoodReview": true}, {"name": "吴记东北大油边", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "瓯海", "addr": "西山南路", "park": "无", "sign": "油边", "reason": "食材比较干净", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "饭特稀", "hasGoodReview": false}, {"name": "丈母娘鱼头烧烤", "cuisine": "烧烤烤肉", "price": "", "region": "瑞安", "addr": "塘河北路66号", "park": "无", "sign": "煎饺，烧烤，牛奶西米露", "reason": "十几年的老店了，本人不爱吃鱼头，但他家煎饺和烧烤也是一绝啊！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "李可爱", "hasGoodReview": true}, {"name": "八月烧烤", "cuisine": "烧烤烤肉", "price": "", "region": "瑞安", "addr": "瑞安市望江小区北门旁", "park": "无", "sign": "烤鲫鱼必点，牛肉串很嫩", "reason": "", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "秃帕子", "hasGoodReview": true}, {"name": "皖北胖子砂锅排档总店", "cuisine": "烧烤烤肉", "price": "", "region": "乐清", "addr": "乐清市柳市镇象北村象北东路129号", "park": "无", "sign": "酸甜口鲫鱼，豆干油香，砂锅烧烤也不错", "reason": "", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "秃帕子", "hasGoodReview": true}, {"name": "阿九面馆(百里路店)", "cuisine": "地方菜", "price": "", "region": "鹿城", "addr": "鹿城区徐衙巷公寓西门东90米", "park": "无", "sign": "蒜香牛蛙+泡面，腰花，糖醋排骨以及一些本地菜", "reason": "", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "秃帕子", "hasGoodReview": true}, {"name": "阿肉大排档", "cuisine": "地方菜", "price": "50-100元", "region": "鹿城", "addr": "藤桥镇北市中路80弄7号", "park": "有", "sign": "家常小炒（海鲜面）", "reason": "老板亲自下厨，坐满15桌左右，几乎天天爆满，最好提前问有没有位置", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "东", "hasGoodReview": true}, {"name": "东北那嘎达", "cuisine": "地方菜", "price": "", "region": "瓯北", "addr": "报喜鸟控股有限公司边上", "park": "无", "sign": "干锅和烧烤比较推荐", "reason": "量大便宜", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "Lucas", "hasGoodReview": true}, {"name": "胖子砂锅烧烤排档", "cuisine": "地方菜", "price": "", "region": "乐清", "addr": "乐清市牛鼻洞慎海北路31号胖子砂锅", "park": "无", "sign": "羊杂羊排羊肚 砂锅  红烧鲫鱼  爆炒螺丝", "reason": "开了十几年了，拆迁之后搬到这里的味道一直很好", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "布拉布拉", "hasGoodReview": true}, {"name": "胖姐东北菜", "cuisine": "地方菜", "price": "50-100元", "region": "龙湾", "addr": "家景花园雁荡西路胖姐东北菜", "park": "有", "sign": "锅包肉 鱼头泡饼", "reason": "温州这边东北菜天花板，性价比高，味道好", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "生菜", "hasGoodReview": true}, {"name": "整点烧烤（贵州烧烤）", "cuisine": "烧烤烤肉", "price": "", "region": "瓯江口", "addr": "海经区瓯江口美的旭辉城边上的小摊", "park": "无", "sign": "烤油边和烤猪小肠好吃！", "reason": "味道很不错", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "吉吉", "hasGoodReview": true}, {"name": "新疆和田玉羊肉烧烤", "cuisine": "烧烤烤肉", "price": "", "region": "乐清", "addr": "乐清市城东街道慎海北路48号", "park": "无", "sign": "羊肉串5块钱一串正宗，还有烤馕", "reason": "新疆人味真足", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "布拉布拉", "hasGoodReview": true}, {"name": "东门小酒馆", "cuisine": "地方菜", "price": "50-100元", "region": "瓯海", "addr": "月乐西街", "park": "有", "sign": "家常小炒", "reason": "家常菜", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "生菜", "hasGoodReview": false}, {"name": "五马老锅贴", "cuisine": "地方菜", "price": "0-50元", "region": "瓯海", "addr": "新桥街道金虹东街145号", "park": "有", "sign": "锅贴", "reason": "现包的韭菜猪肉锅贴", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "东", "hasGoodReview": true}, {"name": "老长沙臭豆腐", "cuisine": "地方菜", "price": "", "region": "乐清", "addr": "乐清市牛鼻洞慎海北路27号布衣大药房(乐清乐成慎海店)门口", "park": "无", "sign": "泡茶黑白臭豆腐", "reason": "夯的，就是老板很随性开不开门不一定，纯看运气", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "布拉布拉", "hasGoodReview": true}, {"name": "阿军饭馆", "cuisine": "地方菜", "price": "50-100元", "region": "鹿城", "addr": "交行广场后面龙沈新村阿军饭店", "park": "有", "sign": "红烧排骨毛血旺yyds", "reason": "吃过不后悔系列", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "生菜", "hasGoodReview": true}, {"name": "佬香馄饨(牛鼻洞店)", "cuisine": "地方菜", "price": "", "region": "乐清", "addr": "乐清市城东街道慎海南路3号", "park": "无", "sign": "牛肉羹和拌面", "reason": "经典味道，永不过时。", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "布拉布拉", "hasGoodReview": true}, {"name": "聚鑫来东北铁锅炖(中济路店)", "cuisine": "地方菜", "price": "", "region": "乐清", "addr": "乐清市中济路28号(清马嘉园西1门旁)", "park": "无", "sign": "东北铁锅炖", "reason": "老板正宗东北人很实在，味真足", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "布拉布拉", "hasGoodReview": true}, {"name": "阿度泡泡", "cuisine": "泡泡/麻辣烫", "price": "50-100元", "region": "瓯海", "addr": "横塘中路 龙霞路 交叉口", "park": "有", "sign": "一家不正经做泡泡的炒菜店，泡泡烧烤火锅炒菜都有都有，", "reason": "18年老店，老板人很好，从一家店开到现在两层楼", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "生菜", "hasGoodReview": true}, {"name": "摊儿萍豆腐花", "cuisine": "甜品蛋糕", "price": "", "region": "乐清", "addr": "乐清市建设西路90号", "park": "有", "sign": "冰豆花好吃", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "布拉布拉", "hasGoodReview": false}, {"name": "丽姐卤味", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "瓯海", "addr": "新塘东苑楼下", "park": "无", "sign": "推荐鸡腿，反正都挺好吃", "reason": "价格很划算，实惠，吃了还想再吃", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "热巴", "hasGoodReview": false}, {"name": "重庆巴爷香辣鸡公煲", "cuisine": "地方菜", "price": "", "region": "瓯海", "addr": "梧田街道月乐西街167号", "park": "无", "sign": "推荐茶树菇鸡公煲 辣", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "打酱油（印象城店）", "cuisine": "火锅", "price": "100-200元", "region": "鹿城", "addr": "印象城a栋4楼电梯口", "park": "有", "sign": "", "reason": "", "review": "", "stars": 0, "recommender": "豆豆", "hasGoodReview": false}, {"name": "润丰和牛杂粉", "cuisine": "其他", "price": "0-50元", "region": "鹿城", "addr": "大南街道飞霞南路499号", "park": "有", "sign": "推荐招牌粉", "reason": "", "review": "⭐⭐⭐", "stars": 3, "recommender": "七七", "hasGoodReview": false}, {"name": "甬小馆", "cuisine": "地方菜", "price": "", "region": "龙湾", "addr": "寺前街96号", "park": "有", "sign": "鸦片鱼头", "reason": "鱼头很入味 并且软烂", "review": "⭐⭐⭐", "stars": 3, "recommender": "七七", "hasGoodReview": false}, {"name": "巴爷香辣鸡煲", "cuisine": "地方菜", "price": "50-100元", "region": "瓯海", "addr": "瓯海景德路61号", "park": "无", "sign": "鸡煲 蛙煲 蟹煲 烤鱼 炒螺蛳 拍黄瓜", "reason": "价格不贵 好吃（烫菜相对来说一般）", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "ss", "hasGoodReview": true}, {"name": "阿国排挡", "cuisine": "地方菜", "price": "50-100元", "region": "瓯海", "addr": "瓯海区瓯海之光山澜苑9-111室", "park": "无", "sign": "香酥鸡  椒盐土豆 炒粉干", "reason": "量大，大学城算不错的", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "123", "hasGoodReview": false}, {"name": "小羊嘟涮肉（巨星店）", "cuisine": "火锅", "price": "", "region": "乐清", "addr": "天成街道巨星村崇善禅寺旁", "park": "无", "sign": "他家蘸料很好吃  羊肉新鲜", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "阿文麻辣烫", "cuisine": "泡泡/麻辣烫", "price": "0-50元", "region": "瓯北", "addr": "塞菲尔珠宝（浦西街店）对面", "park": "有", "sign": "顺便点 都好吃", "reason": "价格实惠 很便宜", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "七七", "hasGoodReview": true}, {"name": "一昕料理", "cuisine": "寿司", "price": "50-100元", "region": "瓯海", "addr": "瓯海区水潭底西路57号", "park": "无", "sign": "脆鳗卷", "reason": "品种不多，店小口味挺好 寿司都不腻", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "123", "hasGoodReview": true}, {"name": "树下汉堡", "cuisine": "西餐", "price": "50-100元", "region": "瓯江口", "addr": "瓯江口产业聚集区北单千路218号", "park": "有", "sign": "每款汉堡都很好吃 牛排品质很好", "reason": "", "review": "⭐⭐⭐", "stars": 3, "recommender": "七七", "hasGoodReview": false}, {"name": "洪记烤炉鸡蛋灌饼", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "鹿城", "addr": "五马街道新华书店对面小巷子里", "park": "有", "sign": "鸡蛋灌饼", "reason": "先煎后烤 饼很酥脆", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "七七", "hasGoodReview": true}, {"name": "御牛道", "cuisine": "烧烤烤肉", "price": "100-200元", "region": "瓯海", "addr": "瓯海万象城", "park": "有", "sign": "牛肉都挺好的", "reason": "牛肉口味不错", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "123", "hasGoodReview": false}, {"name": "皖北阿杰羊肉砂锅", "cuisine": "地方菜", "price": "0-50元", "region": "龙湾", "addr": "龙湾永中街道天中路2071号", "park": "无", "sign": "羊肉砂锅+红薯粉", "reason": "天气降温吃很舒服 吃完容易晕碳", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "七七", "hasGoodReview": true}, {"name": "郑记天天烧烤排挡（悦峰店）", "cuisine": "烧烤烤肉", "price": "", "region": "龙湾", "addr": "龙湾永中街道龙水路金地荣安悦峰园", "park": "无", "sign": "鸦片鱼头  豆腐  砂锅羊杂", "reason": "味道很不错", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "永强海鲜家烧", "cuisine": "地方菜", "price": "", "region": "龙湾", "addr": "龙湾蒲州街道雁荡西路248号", "park": "无", "sign": "", "reason": "老温州菜味道", "review": "⭐⭐⭐", "stars": 3, "recommender": "七七", "hasGoodReview": false}, {"name": "牛味亨牛排", "cuisine": "地方菜", "price": "", "region": "鹿城", "addr": "定位双乐小区 得找一下在居民楼下", "park": "无", "sign": "牛杂粉  牛排", "reason": "", "review": "⭐⭐⭐", "stars": 3, "recommender": "七七", "hasGoodReview": false}, {"name": "老妈私房鱼头（欧洲城店）", "cuisine": "地方菜", "price": "", "region": "鹿城", "addr": "鹿城区瓯城路与飞霞北路交叉口东北方向92米", "park": "有", "sign": "鱼头+手工面", "reason": "吃吧一吃一个不吱声", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "烤鱼舅舅", "cuisine": "地方菜", "price": "", "region": "鹿城", "addr": "鹿城区广化街道西城路68号", "park": "有", "sign": "选秘制+粉条", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "新疆特色风味饭庄阿不都烧烤", "cuisine": "地方菜", "price": "", "region": "瓯海", "addr": "瓯海区鱼鳞浃路新南站后门3-5号", "park": "无", "sign": "烧烤  烤包子  大盘鸡", "reason": "和我在新疆吃的一样", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "七七", "hasGoodReview": true}, {"name": "钱大圣炭火烤肉（柳市店）", "cuisine": "烧烤烤肉", "price": "", "region": "乐清", "addr": "柳市新桥村中心大道75号（连锁店）", "park": "有", "sign": "菜品不踩雷 最推荐 红糖糍粑", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "老北京康记涮羊肉（宁康西路店）", "cuisine": "火锅", "price": "", "region": "乐清", "addr": "乐清城南街道宁康西路237号", "park": "无", "sign": "羊肉好吃", "reason": "价格实惠", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "东家 猪杂粥觅味馆（瑞安店）", "cuisine": "地方菜", "price": "", "region": "瑞安", "addr": "瑞安安阳街道拱瑞山路295-7-8号", "park": "无", "sign": "猪杂粥  干蒸排骨", "reason": "酒后吃一碗很舒服", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "七七", "hasGoodReview": true}, {"name": "39间 肉满多面馆", "cuisine": "地方菜", "price": "", "region": "瑞安", "addr": "瑞安市玉海街道飞云西路112号", "park": "无", "sign": "", "reason": "新鲜现炒  很有锅气", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "七七", "hasGoodReview": false}, {"name": "潘冬月芦田泡泡", "cuisine": "泡泡/麻辣烫", "price": "0-50元", "region": "瓯北", "addr": "瓯北金三角大酒店楼下", "park": "有", "sign": "正常泡泡 但是炸的比较好（停车可以停人行道上来）", "reason": "食材比较新鲜  味道可以", "review": "⭐⭐⭐", "stars": 3, "recommender": "Yt", "hasGoodReview": false}, {"name": "纸上烤鱼鸡公煲", "cuisine": "地方菜", "price": "50-100元", "region": "瓯北", "addr": "瓯北双塔路72号", "park": "无", "sign": "烤鱼鸡公煲都好吃  推荐烤鱼", "reason": "很入味很香，瓯北最好吃的烤鱼之一", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "Yt", "hasGoodReview": true}, {"name": "山来食堂", "cuisine": "其他", "price": "50-100元", "region": "鹿城", "addr": "鹿城区下吕浦双龙路279号", "park": "无", "sign": "基本都种草 创意料理而且性价比很高", "reason": "饭点都要排队 提前加老板wx取号", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "🐷", "hasGoodReview": true}, {"name": "鲜来食尚", "cuisine": "其他", "price": "50-100元", "region": "鹿城", "addr": "鹿城区下吕浦秋明9-103A", "park": "无", "sign": "火拼系列 黄年糕 沸腾牛舌", "reason": "私房菜 懂得都懂", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "🐷", "hasGoodReview": true}, {"name": "不止泡泡", "cuisine": "泡泡/麻辣烫", "price": "50-100元", "region": "鹿城", "addr": "鹿城区西城路132号院", "park": "无", "sign": "", "reason": "还可以 就是一点点贵", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "🐷", "hasGoodReview": false}, {"name": "枇杷树下", "cuisine": "地方菜", "price": "50-100元", "region": "瓯北", "addr": "永嘉县瓯北中楠商业广场211-217号", "park": "有", "sign": "都还不错", "reason": "朋友小聚首选", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "Yt", "hasGoodReview": true}, {"name": "犇云记牛肉火锅", "cuisine": "火锅", "price": "50-100元", "region": "瓯北", "addr": "永嘉县瓯北街道堡一广场轻纺路241号", "park": "有", "sign": "牛肉   不要点太多  真吃不完", "reason": "牛肉新鲜价格实惠量大管饱", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "Yt", "hasGoodReview": true}, {"name": "云南包浆豆腐", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "鹿城", "addr": "鹿城区祥盛锦园东南门旁", "park": "无", "sign": "包浆豆腐 好吃炸了 没吃过白活", "reason": "巨好吃的夸张 小摊 十一点前去 有概率不在", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "🐷", "hasGoodReview": true}, {"name": "金肥羊砂锅", "cuisine": "地方菜", "price": "0-50元", "region": "鹿城", "addr": "鹿城区划龙桥路69号", "park": "无", "sign": "锅包肉夯 羊杂砂锅", "reason": "东北大哥开的小店 位置不多", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "🐷", "hasGoodReview": true}, {"name": "七里香川菜馆", "cuisine": "川菜", "price": "0-50元", "region": "瓯北", "addr": "永嘉县五中花园22幢50号", "park": "无", "sign": "水煮鱼   铁板牛肉", "reason": "味道不错的苍蝇馆子", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "Yt", "hasGoodReview": false}, {"name": "诗蒙", "cuisine": "甜品蛋糕", "price": "0-50元", "region": "鹿城", "addr": "鹿城区府东路180号大公馆二期1-105", "park": "无", "sign": "马卡龙 抹茶卷", "reason": "甜品店 送女孩子自己吃都不错", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "🐷", "hasGoodReview": false}, {"name": "春来酒家", "cuisine": "地方菜", "price": "50-100元", "region": "瓯海", "addr": "瓯海区泽雅镇西雁村西雁路16号", "park": "无", "sign": "农家乐 猪肚汤", "reason": "去泽雅吃农家乐首选", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "🐷", "hasGoodReview": false}, {"name": "炉上川肥肠鱼", "cuisine": "川菜", "price": "50-100元", "region": "鹿城", "addr": "鹿城区蛟翔巷52号", "park": "无", "sign": "肥肠鱼", "reason": "还不错 看运气出品", "review": "⭐⭐⭐", "stars": 3, "recommender": "🐷", "hasGoodReview": false}, {"name": "老望角猪排馆", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "瓯北", "addr": "永嘉县罗浮大街2号", "park": "无", "sign": "猪头排   筒骨   炒粉干", "reason": "肉很香  但是吃多了会腻", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "Yt", "hasGoodReview": false}, {"name": "马鸿兴", "cuisine": "川菜", "price": "100-200元", "region": "瓯北", "addr": "滨江万象城", "park": "有", "sign": "尖叫蛙 响锣炒包菜", "reason": "个人感觉目前温州川菜最好吃的 人多性价比高", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "威少", "hasGoodReview": true}, {"name": "lansy 懒司", "cuisine": "甜品蛋糕", "price": "0-50元", "region": "瑞安", "addr": "瑞安市安民路19-21号", "park": "无", "sign": "无花果他家特色", "reason": "用料慢慢", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "威少", "hasGoodReview": false}, {"name": "阿乐仔油炸", "cuisine": "泡泡/麻辣烫", "price": "50-100元", "region": "乐清", "addr": "乐清市保泰北路与保泰东路交叉口", "park": "无", "sign": "", "reason": "老老店", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "威少", "hasGoodReview": true}, {"name": "合顺东北菜", "cuisine": "地方菜", "price": "50-100元", "region": "瓯海", "addr": "瓯海区高科路89号", "park": "有", "sign": "地三鲜 锅包肉", "reason": "人多性价比高", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "威少", "hasGoodReview": true}, {"name": "东北烧烤", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "瑞安", "addr": "瑞安市棠下镇海安大街222号", "park": "无", "sign": "大油边", "reason": "东北人 价格优惠 味道好，大油边10元", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "威少", "hasGoodReview": false}, {"name": "宏地未来城烧烤", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "瑞安", "addr": "汀田宏地未来城导航重庆小面隔壁店面", "park": "无", "sign": "大油边", "reason": "晚上迟了没菜了，大油边个人当地吃过最好吃的", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "威少", "hasGoodReview": true}, {"name": "大众饺子馆", "cuisine": "地方菜", "price": "0-50元", "region": "瑞安", "addr": "瑞安市莘塍街道新兴中路48号", "park": "无", "sign": "煎饺 羊杂砂锅 炸猪排", "reason": "每次老三样+N", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "威少", "hasGoodReview": true}, {"name": "老街炊饭（北白象店）", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "乐清", "addr": "乐清市象南西路158号", "park": "无", "sign": "糯米饭", "reason": "好吃，就是价格偏贵", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "墨轩", "hasGoodReview": false}, {"name": "黄府粥饭", "cuisine": "地方菜", "price": "50-100元", "region": "鹿城", "addr": "锦绣路971号", "park": "无", "sign": "", "reason": "", "review": "", "stars": 0, "recommender": "郑豆豆", "hasGoodReview": false}, {"name": "纯洁现炒", "cuisine": "地方菜", "price": "50-100元", "region": "鹿城", "addr": "屯前街175号", "park": "无", "sign": "糖醋排骨", "reason": "", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "77", "hasGoodReview": true}, {"name": "摸鱼二队长", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "鹿城", "addr": "鹿城区花源路55号（东欧智库店）", "park": "有", "sign": "鸡爪", "reason": "鸡爪很软烂！鸡爪必点！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "酸奶", "hasGoodReview": true}, {"name": "南山韩", "cuisine": "日式料理", "price": "50-100元", "region": "鹿城", "addr": "欧洲城", "park": "有", "sign": "", "reason": "价格便宜，性价比高，漂亮饭", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "安徒生0862", "hasGoodReview": true}, {"name": "六亩地", "cuisine": "火锅", "price": "100-200元", "region": "鹿城", "addr": "欧洲城", "park": "有", "sign": "牛肉火锅", "reason": "", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "安徒生0862", "hasGoodReview": false}, {"name": "美国佬酒店", "cuisine": "地方菜", "price": "100-200元", "region": "龙湾", "addr": "海城", "park": "无", "sign": "望潮  软壳蟹  酒炖鳗鱼", "reason": "价格小贵 但很值得点宝藏小店", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "萝卜", "hasGoodReview": false}, {"name": "重庆鸡公煲", "cuisine": "火锅", "price": "0-50元", "region": "龙湾", "addr": "公交车永中站首发站对面", "park": "无", "sign": "这个鸡公煲他真的不一样！", "reason": "真穷鬼顶级美食", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "长人馄饨铺", "cuisine": "地方菜", "price": "0-50元", "region": "鹿城", "addr": "鹿城区解放街195号(鼓楼街路口)", "park": "无", "sign": "馄饨，锅贴", "reason": "温州老店，各种小吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "安徒生0862", "hasGoodReview": true}, {"name": "川府大院", "cuisine": "火锅", "price": "50-100元", "region": "龙湾", "addr": "龙湾区永强大道4808号", "park": "有", "sign": "牛肉片、毛肚", "reason": "价格实惠，好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "安徒生0862", "hasGoodReview": true}, {"name": "釜山食堂(人民中路店)", "cuisine": "地方菜", "price": "50-100元", "region": "鹿城", "addr": "浙江省温州市鹿城区五马街道人民中路86号", "park": "有", "sign": "烤肉", "reason": "价格实惠，老板特能叨叨", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "安徒生0862", "hasGoodReview": true}, {"name": "水心地摊贵州烙锅", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "鹿城", "addr": "水心居民楼", "park": "无", "sign": "烤牛肉 烤小肠 烤爆浆老豆腐都好吃", "reason": "价格实惠！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "创荣广场砂锅", "cuisine": "火锅", "price": "0-50元", "region": "瓯海", "addr": "创荣拐角处 鸡柳大人对面", "park": "有", "sign": "砂锅每个都很好吃！", "reason": "价格实惠 大学生都爱吃！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "铁锅年代", "cuisine": "火锅", "price": "0-50元", "region": "龙湾", "addr": "永中街道龙华村B11栋10号", "park": "有", "sign": "地锅鸡！", "reason": "88就能两个人吃破天！烙饼加汤汁超好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "恋平小吃", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "鹿城", "addr": "鹿城区南汇街道万川丽景花苑10栋107-108号", "park": "无", "sign": "豆腐生煎包！广味烤年糕！", "reason": "价格实惠，好吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "米米家火锅", "cuisine": "火锅", "price": "50-100元", "region": "龙湾", "addr": "永强大道716号（司南村附近）", "park": "无", "sign": "牛肉片、羊肉和小酥肉", "reason": "价格合适 好吃实惠！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "贵乡缘遵义羊肉粉（海城店）", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "海城街道中心街130号", "park": "无", "sign": "羊骨粉、羊肉粉", "reason": "秒杀黄太牛的程度", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "阿超炒粉干", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "龙湾区中心街与七甲街交叉口南", "park": "无", "sign": "炒粉干", "reason": "真的带所有人来吃都超好吃！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "阿峰海鲜排挡", "cuisine": "地方菜", "price": "50-100元", "region": "龙湾", "addr": "龙湾区永顺路181号瑞豪商厦1楼", "park": "有", "sign": "蟹粉豆腐！", "reason": "经济实惠 老少皆宜", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "瑞牛火锅（动车站店）", "cuisine": "火锅", "price": "50-100元", "region": "瓯海", "addr": "瓯海区上汇路与中汇路交叉口南100米", "park": "有", "sign": "牛肉的品类都不踩雷！都很好吃！", "reason": "经济实惠好吃！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "永久家沸腾鱼", "cuisine": "川菜", "price": "50-100元", "region": "龙湾", "addr": "龙湾区永中街道香缇华府店", "park": "有", "sign": "沸腾鱼！铁板香芋！", "reason": "真的真的很好吃 每次下楼必吃", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "北头桥饺子", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "龙湾区财智大厦店", "park": "有", "sign": "饺子哦", "reason": "遇事不决就吃碳水的人有福气了！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "夏姐麻辣烫", "cuisine": "泡泡/麻辣烫", "price": "0-50元", "region": "瓯海", "addr": "茶山大学城某个拐角处", "park": "无", "sign": "特色黏糊麻辣烫", "reason": "买的大学生很多 吃了一下感觉还考验", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "汕头牛杂鼎", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "鹿城", "addr": "鹿城区大南街道荷花路214号", "park": "无", "sign": "猪脚饭！四点金！", "reason": "很好吃 但好吃的部位需要提前和老板预定", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "潮牛瓯站牛肉粿条", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "瓯海", "addr": "瓯海区云天楼瓯越大酒店对面", "park": "无", "sign": "每个粿条都很好吃！但别大全家", "reason": "每个粿条都很好吃！但别大全家", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "老衢鲜沸腾鱼", "cuisine": "川菜", "price": "50-100元", "region": "龙湾", "addr": "永中银城-九龙天著6栋106号", "park": "有", "sign": "沸腾鱼", "reason": "沸腾鱼的神！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "洋洋烧烤", "cuisine": "摊摊/小吃", "price": "50-100元", "region": "永嘉", "addr": "永嘉县瓯北镇王家坞路音速兄弟对面", "park": "无", "sign": "烧烤", "reason": "狗哥推荐！", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "萝卜&13253", "hasGoodReview": false}, {"name": "三甲猪头排", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "三甲车站（三甲邮政局对面）", "park": "有", "sign": "猪头排   筒骨   炒粉干", "reason": "开了十几年的老店", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "炒粉干老店", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "永中街道四号街那块", "park": "无", "sign": "炒粉干", "reason": "永中吃夜宵的店里他家真的很多人", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "瓯正味海鲜", "cuisine": "地方菜", "price": "100-200元", "region": "龙湾", "addr": "永宁西路东旭嘉苑2楼", "park": "有", "sign": "家烧海鲜 温州拌面", "reason": "带人来吃还是应酬请客都上得来台面", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "阿凤锅贴", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "鹿城", "addr": "马鞍池东路107-108号", "park": "无", "sign": "鳝鱼面！锅贴！", "reason": "十足的碳水满足炸弹", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "麻辣江湖", "cuisine": "川菜", "price": "50-100元", "region": "龙湾", "addr": "龙湾区龙康路188号", "park": "有", "sign": "锅贴！", "reason": "他家沸腾鱼和锅贴和别人家很不一样！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "胖子羊肉砂锅大排档", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "永强大道1859号", "park": "无", "sign": "羊肉砂锅 小烧烤", "reason": "能开二十几年是真的本事", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "蚝食官", "cuisine": "川菜", "price": "0-50元", "region": "龙湾", "addr": "龙湾区永中东路119号", "park": "无", "sign": "他家的生蚝绝品！", "reason": "他家生蚝还是火锅都很绝！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "阿山牛骨头", "cuisine": "川菜", "price": "50-100元", "region": "龙湾", "addr": "龙湾区富海路196号", "park": "无", "sign": "不点本地菜就冲川菜", "reason": "能开很久的店", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "胡家烧肉", "cuisine": "烧烤烤肉", "price": "50-100元", "region": "瓯海", "addr": "瓯海区月乐西街269号", "park": "无", "sign": "肉", "reason": "他家的肉是熟成！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "鱼头王海鲜", "cuisine": "川菜", "price": "50-100元", "region": "瓯海", "addr": "瓯海区月乐西街278号", "park": "无", "sign": "剁椒鱼头！酸菜钉螺！", "reason": "招牌鱼头是必点！", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "顺伍火锅", "cuisine": "川菜", "price": "50-100元", "region": "鹿城", "addr": "鹿城区雪山路11号", "park": "无", "sign": "牛肉、羊肉", "reason": "特色的烧炭的北京铜炉火锅", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "希望火锅（西一路店）", "cuisine": "火锅", "price": "50-100元", "region": "龙港", "addr": "西一路与柳南路交叉路口东北侧", "park": "无", "sign": "牛肉、羊肉", "reason": "你们见过按盆上的实心肉吗？", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "弘瓯饭店", "cuisine": "地方菜", "price": "50-100元", "region": "龙湾", "addr": "伯爵ktv楼下", "park": "有", "sign": "拌面 家烧海鲜", "reason": "请客送礼最佳地方", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "萝卜", "hasGoodReview": true}, {"name": "得尔乐·榕宴", "cuisine": "地方菜", "price": "100-200元", "region": "瓯海", "addr": "新桥街道富新路8号", "park": "有", "sign": "剁椒鱼头", "reason": "宴请好去处", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "东", "hasGoodReview": true}, {"name": "瓯菜排挡", "cuisine": "地方菜", "price": "50-100元", "region": "瓯海", "addr": "潘桥街道上汇路豪盛花苑10栋103室", "park": "有", "sign": "炸响铃", "reason": "朋友小聚，宴请宾客", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "东", "hasGoodReview": true}, {"name": "老朱烧烤", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "龙湾", "addr": "天河街道办事处对面面馆隔壁", "park": "无", "sign": "鲫鱼！", "reason": "很经典的烧烤", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "萝卜", "hasGoodReview": false}, {"name": "皖北正宗羊肉砂锅", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "永嘉", "addr": "永嘉县三江街道芦田村江边路", "park": "无", "sign": "砂锅！烧烤！", "reason": "好吃美味便宜不贵", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "衍", "hasGoodReview": true}, {"name": "阿雷高压鱼头", "cuisine": "地方菜", "price": "50-100元", "region": "鹿城", "addr": "松台街道信河街石坦大厦", "park": "有", "sign": "鱼头+手工面 ，", "reason": "有个套餐性价比很高，点其他炒菜也不错，本地家常味", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "生菜", "hasGoodReview": true}, {"name": "益佳上海煎包", "cuisine": "地方菜", "price": "0-50元", "region": "文成", "addr": "文成县南田镇市监局对面", "park": "有", "sign": "肉包", "reason": "味道很好，可以提前预约买他们家冷冻的", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "旧友", "hasGoodReview": false}, {"name": "老巷咸菜饼", "cuisine": "摊摊/小吃", "price": "0-50元", "region": "平阳", "addr": "平阳县老巷咸菜饼", "park": "无", "sign": "咸菜饼", "reason": "口味绝佳，外皮酥脆，咸菜香，肉香结合完美，价格亲民", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "不是糊涂蛋", "hasGoodReview": true}, {"name": "D家火锅", "cuisine": "火锅", "price": "50-100元", "region": "鹿城", "addr": "鹿城区第一桥177号", "park": "有", "sign": "都很新鲜 味道非常不错", "reason": "性价比高 而且好吃 送的福利很多 对女生友好", "review": "⭐⭐⭐⭐⭐", "stars": 5, "recommender": "🐷", "hasGoodReview": true}, {"name": "一味独食火锅", "cuisine": "火锅", "price": "50-100元", "region": "鹿城", "addr": "鹿城区东浦小村7幢112室", "park": "有", "sign": "脆鱼片无敌了", "reason": "店面小 有点挤 要排队 味道很不错 一人火锅 吃完送冰淇淋", "review": "⭐⭐⭐⭐", "stars": 4, "recommender": "🐷", "hasGoodReview": false}];
+let _lsOK=true;try{localStorage.setItem("__t","1");localStorage.removeItem("__t")}catch(e){_lsOK=false}
+function lsGet(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):JSON.parse(fb)}catch(e){return JSON.parse(fb)}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+let customs=lsGet("omh_custom","[]");
+let history=lsGet("omh_hist","[]");
+const state={region:new Set(),cuisine:new Set(),price:new Set(),star:new Set(),park:new Set()};
+let pool=[],spinning=false,pos=0; // pos=当前已滚动的像素
+const REPEATS=5, ROWH=62, DUR=4200;
+const $=id=>document.getElementById(id);
+function allStores(){return DATA.concat(customs)}
+function toast(msg){const t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",2200)}
+
+function uniq(k){return [...new Set(allStores().map(r=>r[k]||"").filter(Boolean))]}
+function buildChips(elId,values,set){
+  const el=$(elId);el.innerHTML="";
+  values.forEach(v=>{
+    const c=document.createElement("div");c.className="chip";c.textContent=v;
+    c.onclick=()=>{set.has(v)?set.delete(v):set.add(v);c.classList.toggle("on");refresh()};
+    el.appendChild(c);
+  });
+}
+function buildExtra(){
+  const el=$("f-extra");el.innerHTML="";
+  [["有停车场","有"],["无停车场","无"]].forEach(([label,val])=>{
+    const c=document.createElement("div");c.className="chip";c.textContent=label;
+    c.onclick=()=>{state.park.has(val)?state.park.delete(val):state.park.add(val);c.classList.toggle("on");refresh()};
+    el.appendChild(c);
+  });
+}
+function fillDatalists(){
+  $("dl-region").innerHTML=uniq("region").map(v=>`<option value="${v}">`).join("");
+  $("dl-cuisine").innerHTML=uniq("cuisine").map(v=>`<option value="${v}">`).join("");
+}
+
+function refresh(){
+  pool=allStores().filter(r=>{
+    if(state.region.size&&!state.region.has(r.region))return false;
+    if(state.cuisine.size&&!state.cuisine.has(r.cuisine))return false;
+    if(state.price.size&&!state.price.has(r.price||"未标"))return false;
+    if(state.star.size&&!state.star.has(String(r.stars||0)))return false;
+    if(state.park.size&&!state.park.has(r.park||"无"))return false;
+    if($("onlyRecommender").checked&&!(r.hasGoodReview||r.custom))return false;
+    if($("hideDrawn").checked&&history.some(h=>h.id===r.name+"|"+r.addr))return false;
+    return true;
+  });
+  $("poolCount").textContent=pool.length;
+  $("emptyHint").style.display=pool.length?"none":"block";
+  $("spin").disabled=pool.length===0;
+  renderTrack();
+}
+
+function rowHTML(r){
+  const meta=[r.cuisine,r.region,r.price].filter(Boolean).join(" · ");
+  return `<div class="row"><b>${r.name}</b><span>${meta||" "}</span></div>`;
+}
+function renderTrack(){
+  const tr=$("track");
+  if(!pool.length){tr.innerHTML=`<div class="row"><b>空空如也</b><span>放宽筛选条件吧</span></div>`;tr.style.transform="translateY(0)";return}
+  let html="";
+  for(let k=0;k<REPEATS;k++)html+=pool.map(rowHTML).join("");
+  tr.innerHTML=html;
+  // 初始：让第 REPEATS 轮的第一个（视觉上=列表第一个）停在中奖位，且上方有内容
+  pos=pool.length*ROWH-ROWH; // loops=1, i=0
+  tr.style.transition="none";
+  tr.style.transform=`translateY(${-pos}px)`;
+  tr.offsetHeight; // 强制回流，让初始位置生效且不带动画
+}
+function yFor(loops,i){return (loops*pool.length+i)*ROWH-ROWH}
+
+function spin(){
+  if(spinning||!pool.length)return;
+  spinning=true;$("spin").disabled=true;$("result").classList.remove("show");
+  const n=pool.length;
+  const idx=Math.floor(Math.random()*n);
+  const loops=2+Math.floor(Math.random()*2); // 2~3整圈
+  const target=yFor(loops,idx);
+  const tr=$("track");
+  const dur = DUR + Math.random()*800;
+  let done=false;
+  function finish(){
+    if(done)return;done=true;
+    spinning=false;$("spin").disabled=pool.length===0;
+    const r=pool[idx];
+    showResult(r);confetti();
+    history.unshift({id:r.name+"|"+r.addr,name:r.name,addr:r.addr||"",region:r.region||"",t:new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"})});
+    lsSet("omh_hist",history);renderHist();
+    if($("hideDrawn").checked){refresh()} // 若排除已抽，重排轨道；否则保留位置继续下一轮
+  }
+  tr.style.transition=`transform ${dur}ms cubic-bezier(.08,.78,.12,1)`;
+  tr.style.transform=`translateY(${-target}px)`;
+  pos=target;
+  tr.addEventListener("transitionend",finish,{once:true});
+  setTimeout(finish,dur+500); // 兜底：微信浏览器不触发transitionend也能收尾
+}
+
+function showResult(r){
+  $("r-name").textContent="🏆 "+r.name;
+  const tags=[];
+  if(r.custom)tags.push("✨ 自添加");
+  if(r.cuisine)tags.push("🍴 "+r.cuisine);
+  if(r.region)tags.push("📍 "+r.region);
+  if(r.price)tags.push("💰 "+r.price);
+  if(r.stars)tags.push("⭐".repeat(r.stars));
+  $("r-tags").innerHTML=tags.map(t=>`<div class="rtag">${t}</div>`).join("");
+  $("r-addr").textContent=r.addr||"未填";
+  $("r-price").textContent=r.price||"未标";
+  $("r-park").textContent=r.park||"无";
+  $("r-signrow").style.display=r.sign?"block":"none";
+  $("r-sign").textContent=r.sign||"";
+  $("r-by").textContent=r.recommender||(r.custom?"你自己":"匿名车友");
+  const reason=r.reason||r.review;
+  $("r-reason").textContent=reason?("「"+reason+"」"):"";
+  $("r-reason").style.display=reason?"block":"none";
+  $("r-nav").style.display=r.addr?"block":"none";
+  $("r-nav").href="https://uri.amap.com/search?keyword="+encodeURIComponent((r.name||"")+" "+(r.addr||""));
+  $("r-copy").onclick=()=>{
+    const txt=(r.name||"")+" "+(r.addr||"");
+    const done=()=>toast("已复制到剪贴板");
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fallback())}
+    else fallback();
+    function fallback(){
+      const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";
+      document.body.appendChild(ta);ta.focus();ta.select();
+      try{document.execCommand("copy");done()}catch(e){toast("复制失败，手动长按地址复制")}
+      document.body.removeChild(ta);
+    }
+  };
+  const res=$("result");res.classList.add("show");
+  setTimeout(()=>res.scrollIntoView({behavior:"smooth",block:"start"}),150);
+}
+
+function renderHist(){
+  const card=$("histCard"),list=$("histList");
+  if(!history.length){card.style.display="none";return}
+  card.style.display="block";
+  $("histCount").textContent=history.length+" 次";
+  list.innerHTML=history.map((h,i)=>
+    `<div class="hist-item"><div class="hist-no">${history.length-i}</div>
+     <div class="hist-main"><b>${h.name}</b>${h.region?" · "+h.region:""}<span class="ha">${h.addr||""}</span></div>
+     <div class="hist-time">${h.t}</div></div>`).join("");
+}
+
+function renderCust(){
+  const el=$("custList");
+  if(!customs.length){el.innerHTML="";return}
+  el.innerHTML=customs.map((c,i)=>
+    `<div class="cust-item"><span>✨ ${c.name} <i style="color:var(--sub);font-style:normal;font-size:12px">· ${c.region||"未标"}</i></span><span class="del" data-i="${i}">删除</span></div>`).join("");
+  el.querySelectorAll(".del").forEach(b=>b.onclick=()=>{
+    customs.splice(+b.dataset.i,1);lsSet("omh_custom",customs);
+    renderCust();fillDatalists();refresh();toast("已删除");
+  });
+}
+
+function confetti(){
+  const box=$("confetti"),cols=["#f5c451","#ff6b6b","#4ecdc4","#7bc950","#9b6fd9","#f5a04e"];
+  for(let i=0;i<40;i++){
+    const p=document.createElement("div");p.className="cfp";
+    p.style.left=Math.random()*100+"vw";
+    p.style.background=cols[i%cols.length];
+    p.style.animationDuration=(1.5+Math.random()*1.5)+"s";
+    p.style.animationDelay=(Math.random()*.4)+"s";
+    p.style.borderRadius=Math.random()>.5?"50%":"2px";
+    box.appendChild(p);setTimeout(()=>p.remove(),3400);
+  }
+}
+
+$("addBtn").onclick=()=>{
+  const name=$("i-name").value.trim(),region=$("i-region").value.trim();
+  if(!name||!region){toast("店名和地区必填");return}
+  customs.push({name,region,addr:$("i-addr").value.trim(),cuisine:$("i-cuisine").value.trim()||"其他",
+    price:$("i-price").value,stars:+$("i-stars").value,park:"有",
+    sign:$("i-sign").value.trim(),reason:$("i-reason").value.trim(),review:"",recommender:"你",
+    custom:true,hasGoodReview:true});
+  lsSet("omh_custom",customs);
+  ["i-name","i-region","i-addr","i-cuisine","i-sign","i-reason"].forEach(id=>$(id).value="");
+  renderCust();fillDatalists();refresh();
+  toast("已加入抽奖池 ✨");
+};
+$("toggleForm").onclick=()=>{
+  const w=$("formWrap");const hidden=w.style.display==="none";
+  w.style.display=hidden?"block":"none";
+  $("toggleForm").textContent=hidden?"收起 ▴":"展开 ▾";
+};
+$("histClear").onclick=()=>{history=[];lsSet("omh_hist",history);renderHist();refresh();toast("历史已清空")};
+$("resetFilters").onclick=()=>{
+  Object.values(state).forEach(s=>s.clear());
+  $("hideDrawn").checked=false;$("onlyRecommender").checked=false;
+  document.querySelectorAll(".chip.on").forEach(c=>c.classList.remove("on"));
+  refresh();
+};
+$("spin").onclick=spin;$("againBtn").onclick=spin;
+$("onlyRecommender").onchange=refresh;$("hideDrawn").onchange=refresh;
+
+buildChips("f-region",uniq("region"),state.region);
+buildChips("f-cuisine",uniq("cuisine"),state.cuisine);
+buildChips("f-price",["0-50元","50-100元","100-200元","200元以上","未标"],state.price);
+const starVals=[...new Set(allStores().map(r=>String(r.stars||0)))].filter(s=>s!=="0").sort((a,b)=>b-a);
+buildChips("f-star",starVals,state.star);
+buildExtra();fillDatalists();renderCust();renderHist();refresh();
+</script>
+</body>
+</html>
